@@ -11,6 +11,9 @@ import Vant from 'vant'
 // 加载Vant组件库样式
 import 'vant/lib/index.css'
 
+// 自动设置rem基准值
+import 'amfe-flexible'
+
 Vue.use(Vant)
 
 Vue.config.productionTip = false
