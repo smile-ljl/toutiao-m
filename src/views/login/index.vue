@@ -8,12 +8,19 @@
     />
 
     <!-- 登录表单 -->
-    <van-cell-group>
+    <van-form
+      :show-error="false"
+      :show-error-message="false"
+      validate-first
+      @submit="onLogin"
+      @failed="onFailed"
+      >
       <van-field
         v-model="user.mobile"
         icon-prefix="toutiao"
         left-icon="shouji"
         placeholder="请输入手机号"
+        :rules="FormRules.mobile"
       />
       <van-field
         v-model="user.code"
@@ -21,6 +28,7 @@
         clearable
         left-icon="yanzhengma"
         placeholder="请输入密码"
+        :rules="FormRules.code"
       >
         <template #button>
           <van-button
@@ -38,16 +46,15 @@
           class="login-btn"
           type="info"
           block
-          @click="onLogin"
           >登录</van-button>
       </div>
-    </van-cell-group>
+    </van-form>
     <!-- /登录表单 -->
   </div>
 </template>
 
 <script>
-// import { Notify } from 'vant'
+import { Toast } from 'vant'
 import { login } from '@/api/user'
 export default {
   name: 'LoginIndex',
@@ -58,6 +65,16 @@ export default {
       user: {
         mobile: '',
         code: ''
+      },
+      FormRules: {
+        mobile: [
+          { required: true, message: '请输入手机号' },
+          { pattern: /^1[3|5|7|8|9]\d{9}$/, message: '请输入正确的手机号' }
+        ],
+        code: [
+          { required: true, message: '请输入密码' },
+          { pattern: /^\d{6}$/, message: '请输入正确的密码' }
+        ]
       }
     }
   },
@@ -67,18 +84,26 @@ export default {
   mounted () {},
   methods: {
     async onLogin () {
+      Toast.loading({
+        message: '加载中...',
+        forbidClick: true,
+        duration: 0 // 新的提示会把这个提示替换掉,所以不用手动关闭
+      })
       try {
         const res = await login(this.user)
         console.log(res)
-        this.$notify({
-          message: '登录成功',
-          type: 'success'
-        })
+        Toast.success('登录成功')
       } catch (err) {
-        console.log('登录失败', err)
-        this.$notify({
-          message: '登录失败',
-          type: 'danger'
+        // console.log('登录失败', err)
+        Toast.fail('登录失败')
+      }
+    },
+    onFailed (error) {
+      // console.log(error)
+      if (error.errors[0]) {
+        Toast({
+          message: error.errors[0].message,
+          position: 'top'
         })
       }
     }
