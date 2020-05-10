@@ -12,6 +12,7 @@
       :show-error="false"
       :show-error-message="false"
       validate-first
+      ref="login-from"
       @submit="onLogin"
       @failed="onFailed"
       >
@@ -20,6 +21,7 @@
         icon-prefix="toutiao"
         left-icon="shouji"
         placeholder="请输入手机号"
+        name="mobile"
         :rules="FormRules.mobile"
       />
       <van-field
@@ -28,6 +30,7 @@
         clearable
         left-icon="yanzhengma"
         placeholder="请输入密码"
+        name="code"
         :rules="FormRules.code"
       >
         <template #button>
@@ -35,6 +38,7 @@
             size="mini"
             round
             class="send-btn"
+            @click.prevent="onSendSms"
             >
             发送验证码
             </van-button>
@@ -55,7 +59,10 @@
 
 <script>
 import { Toast } from 'vant'
-import { login } from '@/api/user'
+import {
+  login,
+  sendSms
+} from '@/api/user'
 export default {
   name: 'LoginIndex',
   components: {},
@@ -103,6 +110,32 @@ export default {
       if (error.errors[0]) {
         Toast({
           message: error.errors[0].message,
+          position: 'top'
+        })
+      }
+    },
+    async onSendSms () {
+      try {
+        await this.$refs['login-from'].validate('mobile')
+        // 验证通过,请求发送验证码
+        const res = await sendSms(this.user.mobile)
+        console.log(res)
+      } catch (err) {
+        // console.log(err)
+        let message = ''
+        if (err && err.response && err.response.status === 429) {
+          // 发送短信失败的错误提示
+          message = '发送短信频繁,请稍后重试'
+        } else if (err.name === 'mobile') {
+          // 表单验证失败的错误提示
+          message = err.message
+        } else {
+          // 未知错误
+          message = '发送失败,请稍后重试'
+        }
+        // console.log('验证失败', err)
+        Toast({
+          message,
           position: 'top'
         })
       }
