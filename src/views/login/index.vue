@@ -22,6 +22,7 @@
         left-icon="shouji"
         placeholder="请输入手机号"
         name="mobile"
+        center
         :rules="FormRules.mobile"
       />
       <van-field
@@ -31,12 +32,21 @@
         left-icon="yanzhengma"
         placeholder="请输入密码"
         name="code"
+        center
         :rules="FormRules.code"
       >
         <template #button>
+           <van-count-down
+            v-if="isCountDownShow"
+            :time="1000 * 60"
+            format="ss s"
+            @finish="isCountDownShow = false"
+          />
           <van-button
+            v-else
             size="mini"
             round
+            :loading="isSendSmsLoading"
             class="send-btn"
             @click.prevent="onSendSms"
             >
@@ -82,7 +92,9 @@ export default {
           { required: true, message: '请输入密码' },
           { pattern: /^\d{6}$/, message: '请输入正确的密码' }
         ]
-      }
+      },
+      isCountDownShow: false,
+      isSendSmsLoading: false
     }
   },
   computed: {},
@@ -92,14 +104,14 @@ export default {
   methods: {
     async onLogin () {
       Toast.loading({
-        message: '加载中...',
+        message: '登陆中...',
         forbidClick: true,
         duration: 0 // 新的提示会把这个提示替换掉,所以不用手动关闭
       })
       try {
-        const res = await login(this.user)
-        console.log(res)
+        const { data } = await login(this.user)
         Toast.success('登录成功')
+        this.$store.commit('setUser', data.data)
       } catch (err) {
         // console.log('登录失败', err)
         Toast.fail('登录失败')
@@ -117,9 +129,12 @@ export default {
     async onSendSms () {
       try {
         await this.$refs['login-from'].validate('mobile')
+
+        this.isSendSmsLoading = true
         // 验证通过,请求发送验证码
-        const res = await sendSms(this.user.mobile)
-        console.log(res)
+        await sendSms(this.user.mobile)
+        // 短信发出,隐藏发送按钮,显示倒计时
+        this.isCountDownShow = true
       } catch (err) {
         // console.log(err)
         let message = ''
@@ -139,6 +154,7 @@ export default {
           position: 'top'
         })
       }
+      this.isSendSmsLoading = false
     }
   }
 }
