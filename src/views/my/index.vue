@@ -95,6 +95,7 @@
       class="logout-cell"
       title="退出登录"
       v-if="user"
+      @click="onLogout"
     />
     <!-- /消息通知 / 小智 / 退出按钮 -->
   </div>
@@ -115,7 +116,21 @@ export default {
   watch: {},
   created () {},
   mounted () {},
-  methods: {}
+  methods: {
+    onLogout () {
+      this.$dialog.confirm({
+        title: '退出提示',
+        message: '确认退出?'
+      })
+        .then(() => {
+          // 确认退出 清除用户登录状态
+          this.$store.commit('setUser', null)
+        })
+        .catch(() => {
+          // 退出执行
+        })
+    }
+  }
 }
 </script>
 
