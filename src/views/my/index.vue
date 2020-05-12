@@ -15,12 +15,12 @@
           slot="icon"
           round
           fit="cover"
-          src="https://img.yzcdn.cn/vant/cat.jpeg"
+          :src="currentUser.photo"
         />
         <div
           class="name"
           slot="title"
-        >黑马头条号</div>
+        >{{currentUser.name}}</div>
         <van-button
         class="update-btn"
           size="small"
@@ -33,25 +33,25 @@
       >
         <van-grid-item>
           <div slot="text">
-            <div class="count">123</div>
+            <div class="count">{{currentUser.art_count}}</div>
             <div class="text">头条</div>
           </div>
         </van-grid-item>
         <van-grid-item>
           <div slot="text">
-            <div class="count">123</div>
+            <div class="count">{{currentUser.follow_count}}</div>
             <div class="text">关注</div>
           </div>
         </van-grid-item>
         <van-grid-item>
           <div slot="text">
-            <div class="count">123</div>
+            <div class="count">{{currentUser.fans_count}}</div>
             <div class="text">粉丝</div>
           </div>
         </van-grid-item>
         <van-grid-item>
           <div slot="text">
-            <div class="count">123</div>
+            <div class="count">{{currentUser.like_count}}</div>
             <div class="text">获赞</div>
           </div>
         </van-grid-item>
@@ -103,20 +103,29 @@
 
 <script>
 import { mapState } from 'vuex'
+import { getCurrentUser } from '@/api/user'
 export default {
   name: 'MyIndex',
   components: {},
   props: {},
   data () {
-    return {}
+    return {
+      currentUser: {}
+    }
   },
   computed: {
     ...mapState(['user'])
   },
   watch: {},
-  created () {},
+  created () {
+    this.loadCurentUser()
+  },
   mounted () {},
   methods: {
+    async loadCurentUser () {
+      const { data } = await getCurrentUser()
+      this.currentUser = data.data
+    },
     onLogout () {
       this.$dialog.confirm({
         title: '退出提示',
