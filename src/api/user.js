@@ -36,3 +36,13 @@ export const getCurrentUser = () => {
     // }
   })
 }
+
+/**
+ * 获取频道列表
+ */
+export const getUsreChannels = () => {
+  return request({
+    method: 'GET',
+    url: '/app/v1_0/user/channels'
+  })
+}
