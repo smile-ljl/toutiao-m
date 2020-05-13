@@ -1,17 +1,24 @@
 <template>
   <div class="article-lish">
-    <van-list
-      v-model="loading"
-      :finished="finished"
-      finished-text="没有更多了"
-      @load="onLoad"
+    <van-pull-refresh
+      v-model="isRefreshLoading"
+      :success-text="refreshSuccessText"
+      :success-duration="1500"
+      @refresh="onRefresh"
     >
-      <van-cell
-        v-for="(article, index) in articles"
-        :key="index"
-        :title="article.title"
-      />
-    </van-list>
+      <van-list
+        v-model="loading"
+        :finished="finished"
+        finished-text="没有更多了"
+        @load="onLoad"
+      >
+        <van-cell
+          v-for="(article, index) in articles"
+          :key="index"
+          :title="article.title"
+        />
+      </van-list>
+    </van-pull-refresh>
   </div>
 </template>
 
@@ -31,7 +38,9 @@ export default {
       articles: [],
       loading: false,
       finished: false,
-      timestamp: null
+      timestamp: null,
+      isRefreshLoading: false,
+      refreshSuccessText: ''
     }
   },
   computed: {},
@@ -61,6 +70,17 @@ export default {
         // 没有数据,加载状态设置设置结束
         this.finished = true
       }
+    },
+    async onRefresh () {
+      const { data } = await getArticles({
+        channel_id: this.channel.id,
+        timestamp: this.timestamp || Date.now(),
+        with_top: 1
+      })
+      const { results } = data.data
+      this.articles.unshift(...results)
+      this.isRefreshLoading = false
+      this.refreshSuccessText = `更新了${results.length}条数据`
     }
   }
 }
