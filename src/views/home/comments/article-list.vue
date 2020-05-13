@@ -12,10 +12,15 @@
         finished-text="没有更多了"
         @load="onLoad"
       >
-        <van-cell
+        <!-- <van-cell
           v-for="(article, index) in articles"
           :key="index"
           :title="article.title"
+        /> -->
+        <article-item
+          v-for="(article, index) in articles"
+          :key="index"
+          :article="article"
         />
       </van-list>
     </van-pull-refresh>
@@ -24,9 +29,12 @@
 
 <script>
 import { getArticles } from '@/api/article'
+import ArticleItem from '@/components/article-item/'
 export default {
   name: 'ArticleLish',
-  components: {},
+  components: {
+    ArticleItem
+  },
   props: {
     channel: {
       type: Object,
@@ -49,7 +57,7 @@ export default {
   mounted () {},
   methods: {
     async onLoad () {
-      console.log('onload')
+      // console.log('onload')
       // 1. 请求获取数据
       const { data } = await getArticles({
         channel_id: this.channel.id,
