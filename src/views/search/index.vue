@@ -38,6 +38,9 @@
 import SearchResult from './components/search-result'
 import SearchHistory from './components/search-history'
 import SearchSuggestion from './components/search-suggestion'
+import { getItem, setItem } from '@/utils/storage'
+import { getSearchHistories } from '@/api/search'
+import { mapState } from 'vuex'
 export default {
   name: 'SearchIndex',
   components: {
@@ -53,9 +56,13 @@ export default {
       searchHistories: [] // 搜索历史记录
     }
   },
-  computed: {},
+  computed: {
+    ...mapState(['user'])
+  },
   watch: {},
-  created () {},
+  created () {
+    this.loadSearchHistories()
+  },
   mounted () {},
   methods: {
     onSearch (searchText) {
@@ -66,7 +73,17 @@ export default {
         this.searchHistories.splice(index, 1)
       }
       this.searchHistories.unshift(searchText)
+      setItem('search-histories', this.searchHistories)
       this.isResultShow = true // 展示搜索结果
+    },
+    async loadSearchHistories () {
+      const searchHistories = getItem('search-histories') || []
+      if (this.user) {
+        const { data } = await getSearchHistories()
+        console.log(data.data.keywords)
+      }
+      console.log(searchHistories)
+      this.searchHistories = searchHistories
     }
   }
 }
