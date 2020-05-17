@@ -77,12 +77,16 @@ export default {
       this.isResultShow = true // 展示搜索结果
     },
     async loadSearchHistories () {
-      const searchHistories = getItem('search-histories') || []
+      let searchHistories = getItem('search-histories') || []
       if (this.user) {
         const { data } = await getSearchHistories()
-        console.log(data.data.keywords)
+        // console.log(data.data.keywords)
+        searchHistories = [...new Set([
+          ...searchHistories,
+          ...data.data.keywords
+        ])]
       }
-      console.log(searchHistories)
+      // console.log(searchHistories)
       this.searchHistories = searchHistories
     }
   }
