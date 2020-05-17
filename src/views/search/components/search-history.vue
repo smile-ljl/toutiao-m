@@ -2,7 +2,6 @@
   <div class="search-history">
     <van-cell
       title="搜索历史"
-      icon="search"
     >
       <div>
         <span>全部删除</span>
@@ -11,16 +10,13 @@
       </div>
       <!-- <van-icon name="delete" /> -->
     </van-cell>
-    <van-icon
-     title="hello"
+    <van-cell
+      :title="history"
+      v-for="(history, index) in searchHistories"
+      :key="index"
     >
       <van-icon name="colse" />
-    </van-icon>
-    <van-icon
-     title="hello134"
-    >
-      <van-icon name="colse" />
-    </van-icon>
+    </van-cell>
   </div>
 </template>
 
@@ -28,7 +24,12 @@
 export default {
   name: 'SearchHistory',
   components: {},
-  props: {},
+  props: {
+    searchHistories: {
+      type: Array,
+      required: true
+    }
+  },
   data () {
     return {}
   },

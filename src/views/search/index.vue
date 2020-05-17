@@ -26,7 +26,10 @@
     <!-- /联想搜索 -->
 
     <!-- 搜索历史 -->
-    <search-history v-else />
+    <search-history
+      v-else
+      :search-histories="searchHistories"
+    />
     <!-- /搜索历史 -->
   </div>
 </template>
@@ -46,7 +49,8 @@ export default {
   data () {
     return {
       searchText: '',
-      isResultShow: false // 控制搜索结果的显示状态
+      isResultShow: false, // 控制搜索结果的显示状态
+      searchHistories: [] // 搜索历史记录
     }
   },
   computed: {},
@@ -57,6 +61,11 @@ export default {
     onSearch (searchText) {
       // 把输入框设置为要搜索的文本
       this.searchText = searchText
+      const index = this.searchHistories.indexOf(searchText)
+      if (index !== -1) {
+        this.searchHistories.splice(index, 1)
+      }
+      this.searchHistories.unshift(searchText)
       this.isResultShow = true // 展示搜索结果
     }
   }
